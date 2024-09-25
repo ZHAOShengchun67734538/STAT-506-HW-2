@@ -1,0 +1,416 @@
+---
+title: "STAT 506 HW 2"
+author: "ZHAO Shengchun"
+format: pdf
+editor: visual
+---
+
+## Github URL:
+
+<https://github.com/ZHAOShengchun67734538/STAT-506-HW-2>
+
+## Question 1
+
+**(a)**
+
+```{r}
+# Version 1
+#' Dice game by using loop
+#' @param value (which is the number of dice to roll)
+#' @return Total winnings 
+#' @examples we randomly roll a dice 4 times
+#' the number is {3,4,6,5}, the winning should be
+#' 2x3-2-2-2+2x5-2 = 8, so the function will return 8
+game.loop = function(value)
+{
+  # First we need to check whether the input is valid.
+  # we must assure that the input is a positive integer.
+  if(!is.numeric(value))
+  {
+    warning("Input must be a positive integer.")
+    stop("This input is not a numeric, please try again.")
+  }
+  if(abs(value) != value)
+  {
+    warning("Input must be a positive integer.")
+    stop("This input is not a positive number, please try again.")
+  }
+  if(value != as.integer(value))
+  {
+    warning("Input must be a positive integer.")
+    stop("This input is not an integer, please try again.")
+  }
+  # Main Game Part
+  roll = sample(1:6, size = value, replace = TRUE)
+  winning = 0
+  for(i in 1:value)
+  {
+    if(roll[i] == 3)
+    {
+      #if the roll is 3, 
+      #It is winning 2*3-2=4
+      winning = winning + 4
+    }else if(roll[i] == 5)
+    {
+      #If the roll is 5, 
+      #It is winning 2*5-2=8
+      winning = winning + 8
+    }else{
+      winning = winning - 2
+    }
+  }
+  return(winning)
+}
+```
+
+```{r}
+# Version 2
+#' Dice game by using vectorized function
+#' @param value (which is the number of dice to roll)
+#' @return Total winnings 
+#' @examples we randomly roll a dice 4 times
+#' the number is {3,4,6,5}, the winning should be
+#' 2x3-2-2-2+2x5-2 = 8, so the function will return 8
+game.vectorized = function(value)
+{
+  # First we need to check whether the input is valid.
+  # we must assure that the input is a positive integer.
+  if(!is.numeric(value))
+  {
+    warning("Input must be a positive integer.")
+    stop("This input is not a numeric, please try again.")
+  }
+  if(abs(value) != value)
+  {
+    warning("Input must be a positive integer.")
+    stop("This input is not a positive number, please try again.")
+  }
+  if(value != as.integer(value))
+  {
+    warning("Input must be a positive integer.")
+    stop("This input is not an integer, please try again.")
+  }
+  # Main Game Part
+  roll = sample(1:6, size = value, replace = TRUE)
+  winning = ifelse(roll == 3 | roll == 5, (2*roll-2), -2)
+  return(sum(winning))
+}
+```
+
+```{r}
+# Version 3
+#' Dice game by using table() in r
+#' @param value (which is the number of dice to roll)
+#' @return Total winnings 
+#' @examples we randomly roll a dice 4 times
+#' the number is {3,4,6,5}, the winning should be
+#' 2x3-2-2-2+2x5-2 = 8, so the function will return 8
+game.table = function(value)
+{
+  # First we need to check whether the input is valid.
+  # we must assure that the input is a positive integer.
+  if(!is.numeric(value))
+  {
+    warning("Input must be a positive integer.")
+    stop("This input is not a numeric, please try again.")
+  }
+  if(abs(value) != value)
+  {
+    warning("Input must be a positive integer.")
+    stop("This input is not a positive number, please try again.")
+  }
+  if(value != as.integer(value))
+  {
+    warning("Input must be a positive integer.")
+    stop("This input is not an integer, please try again.")
+  }
+  # Main Game Part
+  roll = sample(1:6, size = value, replace = TRUE)
+  # The table can be transfer to a data frame,
+  # The first column is roll (the dice number appeared)
+  # The second column is the frequency of dice number appeared. 
+  new.roll = as.data.frame(table(roll))
+  new.roll$roll = as.numeric(as.character(new.roll$roll))
+  new.roll$Freq = as.numeric(as.character(new.roll$Freq))
+  # We count the number of dice number is 3
+  win3 = sum(new.roll[which(new.roll$roll==3),2])
+  # We count the number of dice number is 5
+  win5 = sum(new.roll[which(new.roll$roll==5),2])
+  fail = sum(new.roll$Freq)-win3-win5
+  winning = 4*win3+8*win5-2*fail
+  return(winning)
+}
+```
+
+```{r}
+# Version 4
+#' Dice game by using vapply() in r
+#' @param value (which is the number of dice to roll)
+#' @return Total winnings 
+#' @examples we randomly roll a dice 4 times
+#' the number is {3,4,6,5}, the winning should be
+#' 2x3-2-2-2+2x5-2 = 8, so the function will return 8
+game.vapply = function(value)
+{
+  # First we need to check whether the input is valid.
+  # we must assure that the input is a positive integer.
+  if(!is.numeric(value))
+  {
+    warning("Input must be a positive integer.")
+    stop("This input is not a numeric, please try again.")
+  }
+  if(abs(value) != value)
+  {
+    warning("Input must be a positive integer.")
+    stop("This input is not a positive number, please try again.")
+  }
+  if(value != as.integer(value))
+  {
+    warning("Input must be a positive integer.")
+    stop("This input is not an integer, please try again.")
+  }
+  # Main Game Part
+  roll = sample(1:6, size=value, replace = TRUE)
+  # Here we use "vapply" function to calculate the winnings
+  winning = sum(vapply(roll, function(x){
+    if (x == 3)
+    {
+      return(4)
+    }else if(x == 5)
+    {
+      return(8)
+    } 
+    else {
+      return(-2)
+    }
+  },numeric(1)
+  ))
+  return(winning)
+}
+
+```
+
+**(b)**
+
+```{r}
+value1  = 3
+game.loop(value1)
+game.vectorized(value1)
+game.table(value1)
+game.vapply(value1)
+```
+
+```{r}
+value2 = 3000
+game.loop(value2)
+game.vectorized(value2)
+game.table(value2)
+game.vapply(value2)
+```
+
+**(c)**
+
+```{r}
+set.seed(506)
+game.loop(3)
+set.seed(506)
+game.vectorized(3)
+set.seed(506)
+game.table(3)
+set.seed(506)
+game.vapply(3)
+```
+
+```{r}
+set.seed(5061)
+game.loop(3000)
+set.seed(5061)
+game.vectorized(3000)
+set.seed(5061)
+game.table(3000)
+set.seed(5061)
+game.vapply(3000)
+```
+
+**(d)**
+
+```{r}
+library(microbenchmark)
+microbenchmark(game.loop(1000),
+               game.vectorized(1000),
+               game.table(1000),
+               game.vapply(1000))
+```
+
+```{r}
+library(microbenchmark)
+microbenchmark(game.loop(100000),
+               game.vectorized(100000),
+               game.table(100000),
+               game.vapply(100000))
+
+```
+
+We can find the vectorized function performance is always the best, the vapply fucntion is always the slowest. Also, when input value is small, the table function needs more time than the loop function, but when input value increased, this situation reverses, the table function will use less time than the loop function.
+
+**(e)**
+
+This is not a fair game, the expectation is: \# (1/6)x4+(1/6)x8-(4/6)x2 = 2/3 \> 0,
+
+so, the expectation is larger than 0, which means if you roll a dice for a large number,
+
+The winning money will larger than lose money. It is not a fair game.
+
+We can us Monte Carlo to do the simulation:
+
+```{r}
+rept = 10000
+value = 1000
+output = c(1:rept)*0
+expectation = c(1:rept)*0
+for(i in 1:rept)
+{
+  # We use vectorized function here, because it is always the fast.
+  output[i] = game.vectorized(value)
+  expectation[i] = game.vectorized(value)/value
+}
+hist(output, xlim = c(-1000,1500))
+sum(expectation)/rept
+```
+
+From the result, we can find the simulated expectation is very close to 2/3.
+
+## Question 2
+
+**(a)**
+
+```{r}
+data = read.csv("C:/Users/z1883/Desktop/cars.csv",header = TRUE)
+colnames(data) = c("Height","Length","Width","Driveline",
+                   "Engine.Type","Hybrid","Number.of.Forward.Gears",
+                   "Transmission","City.mpg","Fuel.Type","Highway.mpg",
+                   "Classification","ID","Make","Model.Year","Year",
+                   "Horsepower","Torque")
+head(data)
+```
+
+**(b)**
+
+```{r}
+gasoline.data = data[which(data$Fuel.Type == "Gasoline"),]
+head(gasoline.data)
+nrow(gasoline.data)
+```
+
+**(c)**
+
+We first check whether the highway MPG data is strictly positive.
+
+```{r}
+sum(abs(gasoline.data$Highway.mpg) != gasoline.data$Highway.mpg)
+sum(gasoline.data$Highway.mpg == 0)
+sum(is.na(gasoline.data$Highway.mpg))
+```
+
+We can find from the result, the highway MPG data is strictly positive and do not have NA values.
+
+Now, let's check the skewness.
+
+```{r}
+library(e1071)
+skewness(gasoline.data$Highway.mpg)
+```
+
+From the result, we can find the data is highly positive skewed. So, we can use Box-Cox Transformation here, box-cox method will also automatically find the optimal power transformation that minimizes deviations from normality and heteroscedasticity.
+
+```{r}
+library(MASS)
+highwayMPG = 0
+model = lm(Highway.mpg~Torque+Horsepower+Height+Length+Width
+           +as.factor(Year), data=gasoline.data)
+
+b = boxcox(model)
+# Exact the best lambda
+lambda <- b$x[which.max(b$y)] 
+lambda
+
+if(lambda != 0)
+{
+  highwayMPG=(gasoline.data$Highway.mpg^lambda - 1)/lambda
+  
+}else{
+  highwayMPG=log(gasoline.data$Highway.mpg)
+}
+# Check the skewness again
+skewness(highwayMPG)
+```
+
+Let's compare the data before and after transformation by using QQ plot.
+
+```{r}
+# Data before transformation
+qqnorm(gasoline.data$Highway.mpg, pch = 1, frame = FALSE)
+qqline(gasoline.data$Highway.mpg, col = "steelblue", lwd = 2)
+# Data after transformation
+qqnorm(highwayMPG, pch = 1, frame = FALSE)
+qqline(highwayMPG, col = "steelblue", lwd = 2)
+```
+
+From the plot, we can find the data after the transformation is much better.
+
+Combine the transformed data with the original data set.
+
+```{r}
+new.gasoline = cbind(gasoline.data, highwayMPG)
+head(new.gasoline)
+```
+
+**(d)**
+
+```{r}
+# We used the transformed highwayMPG data
+model1 = lm(highwayMPG~Torque+Horsepower+Height+Length+Width
+           +as.factor(Year), data=new.gasoline)
+summary(model1)
+```
+
+Controlling other variables fixed, we can find the torque has a significant negative relationship with the highwayMPG, which means holding other variables constant, the more the value of torque increased, the less the predict highwayMPG.
+
+**(e)**
+
+```{r}
+summary(new.gasoline$Horsepower)
+summary(new.gasoline$Torque)
+hist(new.gasoline$Horsepower,xlim = c(100,650))
+hist(new.gasoline$Torque,xlim = c(90,780))
+```
+
+```{r}
+library(emmeans)
+mod = lm(highwayMPG~Torque*Horsepower+Height+Length+Width
+           +as.factor(Year), data=new.gasoline)
+# From the hist plot above, we can choose three different value for
+# Horsepower which is 100, 275, 450.
+# As for torque, the range is 98-774, so, we set the sequence 
+# from 100 - 800 with 100 distance.
+emmip(mod,Horsepower~Torque, at = list(Horsepower = c(100,275,450),
+                                       Torque = seq(100,800,100)))
+```
+
+From the result, when the horsepower decreased, the line for torque is more and more steep, which means, in higher horsepower, the torque has less negative effect on highway MPG.
+
+**(f)**
+
+We can use this beta.hat = (X'X)\^-1X'Y, where X is the designed matrix
+
+```{r}
+new.gasoline$Year = as.factor(new.gasoline$Year)
+# Find the design matrix
+X = model.matrix(highwayMPG~Torque+Horsepower+Height+Length+Width
+                 +Year, data = new.gasoline)
+head(X)
+beta.hat = solve(t(X)%*%X)%*%(t(X)%*%new.gasoline$highwayMPG)
+beta.hat
+```
+
+From the result, we can find the beta hat is the same as the estimated coefficient obtained by using lm() function.
